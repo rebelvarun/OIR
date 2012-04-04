@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<title>Pulse Prototype</title>
+
+<script language="JavaScript" src="js/jquery-1.5.min.js"></script>
+<script language="JavaScript" src="js/iscroll.js"></script>
+<script language="JavaScript" src="js/iScrollimplement.js"></script>
+
+<style type="text/css" media="all">
+body{
+	height:100%;
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+   
+    position:absolute;
+}
+
+ul{
+    list-style:none;
+}
+
+#Vwrapper {
+	position:absolute; 
+    z-index:1;
+	bottom:10px; left:0;
+	width:100%;
+	overflow:hidden;
+}
+
+.Hwrapper{
+	width:100%;
+	background:#4c4c4c;
+    border-style:solid;
+    border-color:#4c4c4c;
+    border-width: 3px;
+}
+
+.scroller {
+	width:200%;
+	height:100%;
+	float:left;
+}
+
+.scroller img{
+    width:100px;
+    height:100px;
+    margin-top:5px;
+    margin-left:5px;
+    z-index: 100px;
+}
+
+a {  
+    padding: 10px;
+    text-decoration: none;  
+    color: white;  
+    font-weight: bold;  
+    display: inline-block;  
+    border-right: 30px solid transparent;  
+    border-bottom: 30px solid #4c4c4c;     
+    height: 0;  
+    line-height: 50px;  
+}  
+
+.caption{
+    background-image: url('images/pulse_bg.gif');
+    background-repeat: repeat-x;
+}
+
+div.description{  
+    position:absolute; /* absolute position (so we can position it where we want)*/  
+    bottom:4px; /* position will be on bottom */  
+    left:5px;
+    right: 0px;
+    height: 30px;
+    overflow: hidden;
+    display: block;
+    background-color:black;  
+    font-family: 'tahoma';  
+    font-size: 10px;
+    opacity: 0.7;
+    color:white;  
+}  
+div.description_content{  
+    padding-left:3px;
+    
+}  
+div.wrapper{  
+    float:left;
+    position:relative; /* important(so we can absolutely position the description div */  
+    margin-right: 5px;
+    margin-left: 5px;
+}  
+</style>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+<script type="text/javascript">
+$(window).load(function(){  
+    //for each description div...  
+    $('div.description').each(function(){  
+        //...set the opacity to 0...  
+        $(this).css('opacity', 0.7);  
+        //..set width same as the image...  
+        $(this).css('width', $(this).siblings('img').width());  
+        //...get the parent (the wrapper) and set it's width same as the image width... '  
+        $(this).parent().css('width', $(this).siblings('img').width());  
+        //...set the display to block  
+        $(this).css('display', 'block');  
+    });  
+
+  
+});  
+
+function changeBorder(event){
+   if( typeof obj_clicked != "undefined"){
+       
+    $(obj_clicked).css('border','0px solid rgba(0,0,0,0)');
+       
+       $(obj_clicked).find("img").css('width','100px');
+       $(obj_clicked).find("img").css('height','100px');
+       $(obj_clicked).find(".description").css('width','100px');
+   }
+   $(event).css('border-color','#A8A8A8');
+   $(event).css('border-style','solid');
+   $(event).css('border-width','5px');
+   $(event).find("img").css('width','90px');
+   $(event).find("img").css('height','90px');
+   $(event).find(".description").css('width','90px');
+   obj_clicked = event ;
+}
+</script>
+</head>
+
+<body>
+
+
+<div id="Vwrapper"><div id="Vscroller">
+ 	<div id="podcast" class="thelist">
+     
+</div></div></div>
+</body>
+</html>

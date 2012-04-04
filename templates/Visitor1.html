@@ -1,0 +1,55 @@
+<html>
+<head>
+<title>Window User Login</title>
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+<!--<script type="text/javascript" src="js/analytics.js"></script> -->
+<script type="text/javascript">
+        //function makeRequest()
+        //{
+               
+        //}
+        function response()
+        {
+            alert("Sucessful Response");
+        }
+        function visitorLogin()
+        {
+            //alert("Clicked");
+            //var tokenID=document.forms["visitorForm"]["tokenID"].value;
+            //var visitordata={
+            //                     token: tokenID,
+            //                };
+            var url = 'http://ec2-23-20-45-79.compute-1.amazonaws.com/museum/1';
+            //document.getElementById("username").innerHTML
+            $.ajax({
+                type:'GET',
+                url:url,
+                datatype:"text"
+                //timeout: 6000,
+                //error: function(jqXHR, textStatus, errorThrown) {
+                //    if (textStatus == 'timeout') {
+                //        alert("Server not responding")
+                //    }
+                //}
+                
+            })
+            .success(function(data){
+				alert(data);
+                  
+            })
+            .fail(function(xml){
+               alert(xml);
+            })
+        }
+  
+
+</script>
+</head>
+<body>
+ <form name="visitorForm" method="post">
+  TokenID:<input type='text' name="tokenID" /> <br />
+  <input type="button" name="submitform" value="Login" onclick="visitorLogin()"/>
+ </form>
+
+</body>
+</html>

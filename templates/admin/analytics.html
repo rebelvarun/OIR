@@ -1,0 +1,244 @@
+<html>
+<head></head>
+<link href="{{ MEDIA_URL }}static/css/layout.css" rel="stylesheet" type="text/css">
+<script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}static/js/jquery.js"></script>
+<script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}static/js/jquery.flot.js"></script>
+<script language="javascript" type="text/javascript" src="{{ MEDIA_URL }}static/js/jquery.flot.selection.js"></script>
+
+<script type="text/javascript">
+
+	
+        //Ajax Requests for url 
+        function makeRequest(url)
+        { 
+		
+            $.ajax({
+                type:'GET',
+                url:url,
+                datatype:"xml",
+              })
+             .success(function(xml){
+                //Switching to Parsing Function
+                switch (url)
+                {
+                  case 'http://localhost/visitors.xml':
+                        parse_users_xml(xml);
+                        break;
+                  case 'http://localhost/likes.xml':
+                        parse_likes_xml(xml);
+                        break;
+                  case 'http://localhost/clicks.xml':
+                        parse_clicks_xml(xml);
+                        break;
+                  case 'http://localhost/podcasts.xml':
+                        parse_podcasts_xml(xml);
+                        break;
+                  default:
+                        
+                 } 
+               })
+        }
+        //Called for Parsing visitors.xml
+	function parse_users_xml(xml)
+        {
+               var data = new Array();
+               var counter=0;
+               $('museum_vistors', xml).each(function (i) {
+                           //Reading data from xml file 
+			   var timestamp = $(this).find("timestamp").text();			
+		           var visitors = $(this).find("visitors").text();
+		           //Pushing time and visitors in data array
+		           data[counter]=new Array(2);
+		           data[counter][0]=timestamp;
+		           data[counter][1]=visitors;
+		           counter=counter+1;
+               }
+
+    	       var options = {
+	          xaxis: { mode: "time", tickLength: 5 },
+	          selection: { mode: "x" },
+	       };
+	       var plot = $.plot($("#graph"), [d], options);
+	       $("#graph"").bind("plotselected", function (event, ranges) {
+		          // do the zooming
+		           plot = $.plot($("#graph"), [data],
+		           $.extend(true, {}, options, {
+		                  xaxis: { min: ranges.xaxis.from, max: ranges.xaxis.to }
+		           }));            
+        }
+
+        //Called for Parsing likes.xml
+        function parse_likes_xml(xml)
+        {
+               var number_items=0;
+               var data = new Array();
+               var ticks = new Array();
+               $('museum_item', xml).each(function (i) {
+                   //Reading data from xml file 
+                   var item_likes = $(this).find("likes").text();
+                   var item_name = $(this).find("item_name").text();
+                   //Pushing item_name in tick array
+                   ticks[number_items]=new Array(2);
+                   ticks[number_items][0]=number_items;
+                   ticks[number_items][1]=item_name;
+                   //Pushing item_likes in data array
+                   data[number_items] = new Array(2);
+                   data[number_items][0]=number_items;
+                   data[number_items][1]=item_likes;  
+                   //Incrementing number_items
+                   number_items=number_items+1;                   
+               } 
+               var stack = 0, bars = true, lines = false, steps = false;
+               $.plot($("#graph"), [data] ,{
+                       xaxis: { ticks: ticks},
+	                series: {
+                               stack: stack,
+                               lines: { show: lines, fill: true, steps: steps },
+                               bars: { show: bars, barWidth: 0.1 }
+                               }
+       	        });                                
+        }
+
+        //Called for Parsing clicks.xml
+        function parse_clicks_xml(xml)
+        {
+               var number_items=0;
+               var data = new Array();
+               var ticks = new Array();
+               $('museum_item', xml).each(function (i) {
+                   //Reading data from xml file 
+                   var item_clicks = $(this).find("clicks").text();
+                   var item_name = $(this).find("item_name").text();
+                   //Pushing item_name in tick array
+                   ticks[number_items]=new Array(2);
+                   ticks[number_items][0]=number_items;
+                   ticks[number_items][1]=item_name;
+                   //Pushing item_likes in data array
+                   data[number_items] = new Array(2);
+                   data[number_items][0]=number_items;
+                   data[number_items][1]=item_clicks;  
+                   //Incrementing number_items
+                   number_items=number_items+1;                   
+               } 
+               var stack = 0, bars = true, lines = false, steps = false;
+               $.plot($("#graph"), [data] ,{
+                       xaxis: { ticks: ticks},
+	                series: {
+                               stack: stack,
+                               lines: { show: lines, fill: true, steps: steps },
+                               bars: { show: bars, barWidth: 0.1 }
+                               }
+       	        });                               
+        }
+
+        //Called for Parsing podcasts.xml
+        function parse_podcasts_xml(xml)
+        {
+               var number_items=0;
+               var data = new Array();
+               var ticks = new Array();
+               $('museum_item', xml).each(function (i) {
+                   //Reading data from xml file 
+                   var item_podcast = $(this).find("plays").text();
+                   var item_name = $(this).find("item_name").text();
+                   //Pushing item_name in tick array
+                   ticks[number_items]=new Array(2);
+                   ticks[number_items][0]=number_items;
+                   ticks[number_items][1]=item_name;
+                   //Pushing item_likes in data array
+                   data[number_items] = new Array(2);
+                   data[number_items][0]=number_items;
+                   data[number_items][1]=item_podcast;  
+                   //Incrementing number_items
+                   number_items=number_items+1;                   
+               } 
+               var stack = 0, bars = true, lines = false, steps = false;
+               $.plot($("#graph"), [data] ,{
+                       xaxis: { ticks: ticks},
+	                series: {
+                               stack: stack,
+                               lines: { show: lines, fill: true, steps: steps },
+                               bars: { show: bars, barWidth: 0.1 }
+                               }
+       	        });                                   
+        }
+</script>
+
+
+
+<body class="dashboard">
+<div id="container"> 
+    <!-- Header -->
+    <div id="header">
+        <div id="branding"> 
+           <h1 id="site-name">Oir Admin</h1>
+        </div>
+        <div id="user-tools">
+            Welcome,
+            <!--<div id="user-loggedin">-->
+                    <strong>oir</strong>.
+            <!--</div>-->
+            <a href="/admin/password_change/">Change password</a> /
+            <a href="/admin/logout/">Log out</a>    
+        </div>    
+    </div>
+    <!-- END Header -->
+
+    <!-- Content -->
+    <div id="content" class="colMS">
+        <h1>Your Dashboard</h1>
+        <!--Display Options-->
+        <div id="content-main" class="colMS">
+            <div class="module">
+                 <table>
+		    <tr>
+		        <th><a href="" id="users_per_time" >Number of Users</a></th>
+		    </tr>
+		    <tr>
+		        <th><a href="" id="likes_per_item">Number of Likes per item</a></th>  
+		    </tr>
+		    <tr>
+		        <th><a href="" id="clicks_per_item">Number of Clicks per item</a></th>
+		    </tr>
+		    <tr>
+		        <th><a href="" id="podcasts_per_item">Number of Podcasts per item</a></th>         
+		    </tr>
+                  </table>
+            </div>
+        </div>
+        <!--Display Graph-->  
+        <div id="graph" style="width:600px;height:300px"></div> 
+     </div>
+     <!-- End of Content-->
+</div>
+</body>
+
+<script type="text/javascript">
+
+        // CLICK EVENT :: Users per time
+        $('#users_per_time').click(function (event) {
+          var url = 'http://localhost/visitors.xml';
+          makeRequest(url);
+       
+        });
+                
+        // CLICK EVENT :: Likes per item
+        $('#likes_per_item').click(function (event) {
+            var url = 'http://localhost/likes.xml';
+            makeRequest(url);
+         });
+
+        // CLICK EVENT :: Clicks per item
+        $('#clicks_per_item').click(function (event) {
+            var url = 'http://localhost/clicks.xml';
+            makeRequest(url);
+         });
+        
+        // CLICK EVENT :: Podcasts per item
+        $('#podcasts_per_item').click(function (event) {
+            var url = 'http://localhost/podcasts.xml'; 
+            makeRequest(url);
+         });
+
+</script>
+</html>

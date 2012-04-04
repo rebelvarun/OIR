@@ -1,0 +1,16 @@
+<museum_item>
+<id>{{item.id}}</id>
+<category>{{item.category.category}}</category>
+<title short="" regular="{{item.title}}"></title>
+
+<position_x></position_x>
+<position_y></position_y>
+<map_point_color></map_point_color>
+<map_text></map_text>
+
+<box_art small="" medium="" large="/media/{{item.image}}"></box_art>
+
+<release_year></release_year>
+<synopsis>{{item.synopsis}}</synopsis>
+<rating></rating>
+</museum_item>

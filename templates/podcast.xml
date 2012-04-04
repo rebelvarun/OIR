@@ -1,0 +1,5 @@
+<museum_item>
+	<image src="/media/{{item.image}}" alt="" title="" ></image>
+	<caption>{{item.caption}}</caption>
+	<podcast>/media/{{item.podcast}}</podcast>
+</museum_item>

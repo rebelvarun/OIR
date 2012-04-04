@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<museum>
+<area class="hs_area hs_area1">
+    <img class="hs_visible" src="/media/static/images/area1/1.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area1/2.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area1/3.jpg" alt=""/>
+</area>
+<area class="hs_area hs_area2">
+    <img class="hs_visible" src="/media/static/images/area2/1.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area2/2.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area2/3.jpg" alt=""/>
+</area>
+<area class="hs_area hs_area3">
+    <img class="hs_visible" src="/media/static/images/area3/1.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area3/2.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area3/3.jpg" alt=""/>
+</area>
+<area class="hs_area hs_area4">
+    <img class="hs_visible" src="/media/static/images/area4/1.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area4/2.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area4/3.jpg" alt=""/>
+</area>
+<area class="hs_area hs_area5">
+    <img class="hs_visible" src="/media/static/images/area5/1.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area5/2.jpg" alt=""/>
+    <img class="hs_invisible" src="/media/static/images/area5/3.jpg" alt=""/>
+</area>
+</museum>

@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" /> 
+    <title>Museum</title>
+    
+    <!-- Includes CSS for the file -->
+    <link rel="stylesheet" href="/media/static/css/style.css?v=2">
+    <style>
+        .qitem
+        {
+            width:126px;
+            height:126px;
+            border:4px solid #A0A0A0 ;
+            margin-left: 10px;
+            margin-right: 10px;
+            margin-top: 10px;
+            background:url('bg.gif') no-repeat;
+            /* required to hide the image after resized */overflow:hidden;/* for child absolute position */position:relative;/* display div in line */float:left;cursor:hand;cursor:pointer;}.qitem img{border:0;/* allow javascript moves the img position*/position:absolute;z-index:200;}.qitem .caption{position:absolute;z-index:0;color:#ccc;display:block;}.qitem .caption h4{font-size:12px;padding:10px 5px 0 8px;margin:0;color:#369ead;}.qitem .caption p{font-size:10px;padding:3px 5px 0 8px;margin:0;}
+            .topLeft,
+            .topRight,
+            .bottomLeft,
+            .bottomRight{position:absolute;background-repeat:no-repeat;float:left;}.topLeft{background-position:top left;}.topRight{background-position:top right;}.bottomLeft{background-position:bottom left;}.bottomRight{background-position:bottom right;}.clear{clear:both;}
+            
+    </style>
+</head>
+<body id="me">
+    
+    <div id="bottomBar">      
+        <div id="buttonContainer">
+            <div style="margin-left:auto; margin-right:auto; width:306px;">
+                <div id="home" class="clicked"></div>
+                <div id="places" class="normal"></div>
+                <div id="podcasts" class="normal"></div>
+                <div id="maps" class="normal"></div>
+            </div>
+        </div>
+    </div>    
+
+     <!-- For Search Bar drop down categories -->
+
+    <div id="dataSection">
+        <div id="wrapper">
+            <ul id="videosList"></ul>
+        </div>
+    </div>
+    
+    <script type="text/javascript" src="/media/static/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/media/static/js/iscroll.js"></script>
+    <script type="text/javascript" src="/media/static/js/analytics.js"></script>
+    
+    <script src="/media/static/js/jquery.easing.1.3.js"></script>
+ 
+  
+    <script type="text/javascript">
+        myscroll = null;
+        play = false;
+        lastClicked = -1;
+        prevSearched = '';
+        requests = [];
+        
+        function isUndefined(obj) {
+            if(obj == null || typeof obj == "undefined" || obj == undefined || obj == '') {
+                return true;
+            } else {
+                return false;
+            }
+        }
+
+        function loaded() {
+            console.log('Height is - ' + $('#dataSection').height());
+            myscroll = new iScroll('dataSection', { hScroll: false, hScrollbar: false, vScrollbar: false });
+        }
+        
+        function unloaded() {
+            if (myscroll !== null) {
+                 myscroll.refresh();
+                //myscroll = null;
+            }
+        }        
+
+        function normalizeAllBtns() {
+            $('#bottomBar > div').children().each(function() {
+                $(this).removeClass('clicked').addClass('normal');
+            });
+            $('#playerControls').hide();
+            play = false;
+            $('#now_playing_video').hide();
+        }
+        
+        
+        function getCookie(key)
+        {
+            var i,x,y,ARRcookies=document.cookie.split(";");
+            for (i=0;i<ARRcookies.length;i++)
+            {
+              x=ARRcookies[i].substr(0,ARRcookies[i].indexOf("="));
+              y=ARRcookies[i].substr(ARRcookies[i].indexOf("=")+1);
+              x=x.replace(/^\s+|\s+$/g,"");
+              if (x==key)
+                {
+                return unescape(y);
+                }
+              }
+        };
+        
+        // Function to abort all pending requests
+        function abort_pending_requests(){
+               for(index = 0; index <requests.length ; index++)
+                    requests[index].abort();
+        }
+        
+        function display_subCategory(object,event){
+            normalizeAllBtns();
+            sendAnalyticData(event);
+            var url = 'http://ec2-23-20-45-79.compute-1.amazonaws.com/museum/1/'+ object.id +'/';
+            museum.makeRequest(url,museum.display_subplaces);
+            $(this).removeClass('normal').addClass('clicked');
+            hideSearchBar();
+        }
+        
+        function sendAnalyticData(event){
+            // fucking difference b.w even event.target // event.currentTarget and event.relatedTarget not to mention evet 
+            //analytics.clickData(CODE, event.currentTarget.id, ANALYTICS_SERVER);
+        }
+   
+        museum = {
+            data: {},
+            touchState: 0, /* Represents whether click was sent or movement was done */
+            start: {}, /* Starting position of touch */
+            prev: {}, /* Previous position of touch */
+            now: {}, /* Current position of touch */
+            now_playing_id: null,
+            THRESHOLD: 10,
+
+            /* Store the datasection to scroll for minimizing calls to document */
+            dataSectionDOM: { topBound: null, bottomBound: null },
+            
+            touchStart: function (event) {
+                event.preventDefault();
+                this.touchState = 1;
+
+                /* No horizontal scrolling */
+                this.start.y = this.now.y = this.prev.y = event.touches[0].pageY;
+            },
+
+            touchMove: function (event) {
+                event.preventDefault();
+                this.now.y = event.touches[0].pageY;
+
+                if ((this.end.y - this.start.y) > this.THRESHOLD) {
+                    /* Fetch the direction of  vertical movement and scroll accordingly  */
+                    //this.dataSectionDOMObj. ;
+                }
+                this.prev.y = this.now.y;
+
+                this.touchState = 2;
+            },
+
+            touchEnd: function (event) {
+                this.reset(event);
+            },
+
+            touchCancel: function (event) {
+                this.reset(event);
+            },
+
+            reset: function (event) {
+                if (this.touchState == 1) {
+                    /* Send click if no movement was done */
+                    console.log(event.target.id);
+                }
+                this.touchState = 0;
+                this.start = {};
+                this.end = {};
+            },
+            
+            // query_url is the url request and parse_xml is the function that shall be called on retrieving the xml from server
+            makeRequest: function(query_url, parse_xml){
+                requests.push(
+                   $.ajax({
+                        url: query_url,
+                        dataType: "xml",
+                        success: function(xml){     
+                            parse_xml(xml);
+                            console.log(xml);        
+                        }
+                   })
+                );
+            },
+            
+            display_home: function(xml){
+                unloaded();
+                // in case some pending ajax requests 
+                abort_pending_requests();
+                //clearing the datasection
+                $('#videosList').empty();
+                $('iframe').remove();
+                if($('#pulse').length > 0)
+                    $('#pulse').hide();
+                var element = '<div id="hs_container" class="hs_container">';
+                $('area', xml).each(function (i) {
+                   
+                   var area_class = $(this).attr("class");
+                   var image_1 = $(this).find("img:eq(0)").attr("src");
+                   var image_1_class = $(this).find("img:eq(0)").attr("class");
+                   
+                   var image_2 = $(this).find("img:eq(1)").attr("src");
+                   var image_2_class = $(this).find("img:eq(1)").attr("class");
+                   
+                   var image_3 = $(this).find("img:eq(2)").attr("src");
+                   var image_3_class = $(this).find("img:eq(2)").attr("class");
+                   
+                   element += '<div class="' + area_class + '">'+
+					'<img class="'+image_1_class +'" src="' + image_1 + '" alt=""/>'+
+					'<img class="'+image_2_class+ '" src="'+image_2+'" alt=""/>'+
+					'<img class="'+image_3_class+ '" src="'+image_3+'" alt=""/>'+
+                    '</div>'
+                   
+                });
+                element +='</div>';
+                $('#videosList').append(element);
+                
+                  var animations		= ['right','left','top','bottom','rightFade','leftFade','topFade','bottomFade'];
+				var total_anim		= animations.length;
+				//just change this to one of your choice
+				var easeType		= 'swing';
+				//the speed of each transition
+				var animSpeed		= 450;
+				//caching
+				var $hs_container	= $('#hs_container');
+				var $hs_areas		= $hs_container.find('.hs_area');
+				
+				//first preload all images
+                $hs_images          = $hs_container.find('img');
+                var total_images    = $hs_images.length;
+                var cnt             = 0;
+                $hs_images.each(function(){
+                    var $this = $(this);
+                    $('<img/>').load(function(){
+                        ++cnt;
+                        if(cnt == total_images){
+							$hs_areas.each(function(){
+								var $area 		= $(this);
+								//when the mouse enters the area we animate the current
+								//image (random animation from array animations),
+								//so that the next one gets visible.
+								//"over" is a flag indicating if we can animate 
+								//an area or not (we don't want 2 animations 
+								//at the same time for each area)
+								$area.data('over',true).bind('mouseenter',function(){
+									if($area.data('over')){
+										$area.data('over',false);
+										//how many images in this area?
+										var total		= $area.children().length;
+										//visible image
+										var $current 	= $area.find('img:visible');
+										//index of visible image
+										var idx_current = $current.index();
+										//the next image that's going to be displayed.
+										//either the next one, or the first one if the current is the last
+										var $next		= (idx_current == total-1) ? $area.children(':first') : $current.next();
+										//show next one (not yet visible)
+										$next.show();
+										//get a random animation
+										var anim		= animations[Math.floor(Math.random()*total_anim)];
+										switch(anim){
+											//current slides out from the right
+											case 'right':
+												$current.animate({
+													'left':$current.width()+'px'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'left'		: '0px'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+											//current slides out from the left
+											case 'left':
+												$current.animate({
+													'left':-$current.width()+'px'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'left'		: '0px'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+											//current slides out from the top	
+											case 'top':
+												$current.animate({
+													'top':-$current.height()+'px'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'top'		: '0px'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+											//current slides out from the bottom	
+											case 'bottom':
+												$current.animate({
+													'top':$current.height()+'px'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'top'		: '0px'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+											//current slides out from the right	and fades out
+											case 'rightFade':
+												$current.animate({
+													'left':$current.width()+'px',
+													'opacity':'0'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'left'		: '0px',
+														'opacity'	: '1'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+											//current slides out from the left and fades out	
+											case 'leftFade':
+												$current.animate({
+													'left':-$current.width()+'px','opacity':'0'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'left'		: '0px',
+														'opacity'	: '1'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+											//current slides out from the top and fades out	
+											case 'topFade':
+												$current.animate({
+													'top':-$current.height()+'px',
+													'opacity':'0'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'top'		: '0px',
+														'opacity'	: '1'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+											//current slides out from the bottom and fades out	
+											case 'bottomFade':
+												$current.animate({
+													'top':$current.height()+'px',
+													'opacity':'0'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'top'		: '0px',
+														'opacity'	: '1'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;		
+											default:
+												$current.animate({
+													'left':-$current.width()+'px'
+												},
+												animSpeed,
+												easeType,
+												function(){
+													$current.hide().css({
+														'z-index'	: '1',
+														'left'		: '0px'
+													});
+													$next.css('z-index','9999');
+													$area.data('over',true);
+												});
+												break;
+										}	
+									}
+								});
+							});
+							
+							//when clicking the hs_container all areas get slided
+							//(just for fun...you would probably want to enter the site
+							//or something similar)
+							$hs_container.bind('click',function(){
+								$hs_areas.trigger('mouseenter');
+							});
+						}
+					}).attr('src',$this.attr('src'));
+				});			
+				
+                setTimeout(function () { myscroll.refresh(); }, 0);
+            
+            
+            },
+            
+            display_subplaces: function(xml){
+                // for iscroll 
+                unloaded();
+                // in case some pending ajax requests 
+                abort_pending_requests();
+                //clearing the datasection
+                $('#videosList').empty();
+                $('iframe').remove();
+                var i=0;
+                $('museum_item', xml).each(function (i) {
+                   
+                   var item_url = $(this).find("link").attr("href");
+                   var item_synopsis = $(this).find("synopsis").text();
+                   var item_image = $(this).find("box_art").attr("large");
+                   var item_title = $(this).find("title").attr("regular");
+                   var item_rating = $(this).find("rating");
+                   var item_year = $(this).find("release_year");
+                   
+                   if(item_title.length > 25)
+                        item_title = item_title.substr(0,25) + ".."
+                    
+                   if(item_synopsis.length > 80)
+                        item_synopsis = item_synopsis.substr(0,80) + ".."
+                    i++;                    
+                    var element = '<li id="'+ item_title +'" class="entries" onclick="sendAnalyticData(event)" ><div class="entrythumbnails" ><img alt="' + item_title + '" src="' + item_image + '"></div>';
+                    element += '<div class="entrydescr"><br /><span class="vidtitle">' + item_title + '</span><br />'+item_synopsis+ '</div></li>';    
+                    $('#videosList').append($(element));
+                });
+                setTimeout(function () { myscroll.refresh(); }, 0);
+            },
+            
+            display_podcasts: function(xml){
+                
+                unloaded();
+                // in case some pending ajax requests 
+                abort_pending_requests();
+                //clearing the datasection
+                $('#videosList').empty();
+                $('iframe').remove();
+                var counter = 1;    
+                var element = '<iframe width="100%" height="100%" scrolling="no"  src="/media/static/PulsePrototype.html"><iframe>';
+               $('#wrapper').append($(element));
+               
+                
+            },
+            
+            display_places: function(xml){
+                 unloaded();
+                // in case some pending ajax requests 
+                abort_pending_requests();
+                //clearing the datasection
+                $('#videosList').empty();
+                $('iframe').remove();
+                var counter = 1;    
+
+                $('slider_item', xml).each(function (i) {
+                   
+				   var item_id = $(this).find("id").text();
+                   var item_src = $(this).find("image").attr("src");
+                   var item_alt = $(this).find("image").attr("alt");
+                   var item_title = $(this).find("image").attr("title");
+                   var item_caption = $(this).find("caption").text();
+                   var item_description = $(this).find("description").text();
+                   var item_category = $(this).find("category").text();
+                   
+                   if(item_caption.length > 25)
+                        item_caption = item_caption.substr(0,25) + ".."
+                    
+                   if(item_description.length > 80)
+                        item_description = item_description.substr(0,80) + ".."
+                                        
+                    var element = '<div class="qitem" id="'+item_id+'" onclick="display_subCategory(this,event)" ><img src="'+ item_src +'" alt="'+ item_alt +'" title="'+ item_title+'" width="126" height="126"/><span class="caption"><h4>'+ item_caption +'</h4><p>' + item_description +'</p></span></div>';    
+                    
+                    if(counter % 2 === 0 ){
+                        element +='<div class="clear"></div>';
+                    }
+                    $('#videosList').append($(element));
+                    counter = counter + 1;
+                });
+                var style_in = 'easeOutBounce';
+                var style_out = 'jswing';
+                var speed_in = 1000;
+                var speed_out = 300;	
+
+                //Calculation for corners
+                var neg = Math.round($('.qitem').width() / 2) * (-1);	
+                var pos = neg * (-1);	
+                var out = pos * 2;
+                
+                $('.qitem').each(function () {
+                
+                    url = $(this).find('a').attr('href');
+                    img = $(this).find('img').attr('src');
+                    alt = $(this).find('img').attr('img');
+                    
+                    $('img', this).remove();
+                    $(this).append('<div class="topLeft"></div><div class="topRight"></div><div class="bottomLeft"></div><div class="bottomRight"></div>');
+                    $(this).children('div').css('background-image','url('+ img + ')');
+
+                    $(this).find('div.topLeft').css({top:0, left:0, width:pos , height:pos});	
+                    $(this).find('div.topRight').css({top:0, left:pos, width:pos , height:pos});	
+                    $(this).find('div.bottomLeft').css({bottom:0, left:0, width:pos , height:pos});	
+                    $(this).find('div.bottomRight').css({bottom:0, left:pos, width:pos , height:pos});	
+
+                }).hover(function () {
+                
+                    $(this).find('div.topLeft').stop(false, true).animate({top:neg, left:neg}, {duration:speed_out, easing:style_out});	
+                    $(this).find('div.topRight').stop(false, true).animate({top:neg, left:out}, {duration:speed_out, easing:style_out});	
+                    $(this).find('div.bottomLeft').stop(false, true).animate({bottom:neg, left:neg}, {duration:speed_out, easing:style_out});	
+                    $(this).find('div.bottomRight').stop(false, true).animate({bottom:neg, left:out}, {duration:speed_out, easing:style_out});	
+                            
+                },
+                
+                function () {
+
+                    $(this).find('div.topLeft').stop(false, true).animate({top:0, left:0}, {duration:speed_in, easing:style_in});	
+                    $(this).find('div.topRight').stop(false, true).animate({top:0, left:pos}, {duration:speed_in, easing:style_in});	
+                    $(this).find('div.bottomLeft').stop(false, true).animate({bottom:0, left:0}, {duration:speed_in, easing:style_in});	
+                    $(this).find('div.bottomRight').stop(false, true).animate({bottom:0, left:pos}, {duration:speed_in, easing:style_in});	
+                
+                })
+                
+                //setTimeout(function () { myscroll.refresh(); }, 0);
+            },
+            
+            init: function () {
+                loaded();
+                document.addEventListener('touchmove', function (e) { e.preventDefault(); }, false);
+                ANALYTICS_SERVER = 'http://ec2-23-20-45-79.compute-1.amazonaws.com/log.txt';
+                //CODE = getCookie('code');
+				document.cookie='code=ABC';
+				CODE=getCookie('code');
+                //CODE = 'ABC';
+                // CLICK EVENT :: Home
+                $('#home').click(function (event) {
+                    normalizeAllBtns();
+                    sendAnalyticData(event);
+                    var url = 'http://ec2-23-20-45-79.compute-1.amazonaws.com/media/static/home.xml';
+                    museum.makeRequest(url,museum.display_home);
+                    //museum.display_home();
+                   $(this).removeClass('normal').addClass('clicked');
+                   // hideSearchBar();
+                });
+
+                // CLICK EVENT :: Places
+                $('#places').click(function (event) {
+                    normalizeAllBtns();
+                    sendAnalyticData(event);
+                    var url = 'http://ec2-23-20-45-79.compute-1.amazonaws.com/museum/1/';
+                    museum.makeRequest(url,museum.display_places);
+                    $(this).removeClass('normal').addClass('clicked');
+                   // hideSearchBar();
+                });
+                
+                // CLICK EVENT :: Podcasts
+                 $('#podcasts').click(function (event) {
+                    normalizeAllBtns();
+                    sendAnalyticData(event);
+                    var url = 'http://ec2-23-20-45-79.compute-1.amazonaws.com/museum/podcast/1/';
+                    museum.makeRequest(url,museum.display_podcasts);
+                    $(this).removeClass('normal').addClass('clicked');
+                   // hideSearchBar();
+                });
+                
+                // CLICK EVENT :: Maps
+                $('#maps').click(function (event) {
+                    normalizeAllBtns();
+                    sendAnalyticData(event);
+                    museum.parse_recommendations(recommendations_xml);
+                    $(this).removeClass('normal').addClass('clicked');
+                   // hideSearchBar();
+                });
+          
+
+            $(window).scroll(function () {
+                $('#bottomBar').css('top', window.pageYOffset + window.innerHeight - $('#bottomBar').height());                    
+                $('#searchBar').css('top', $(window).scrollTop());
+            });
+            }
+        };
+        museum.init();
+    </script>
+</body>
+</html>

@@ -1,0 +1,8 @@
+<slider_item>
+	<id>{{item.id}}</id>
+	<image src="/media/{{item.image}}" alt="" title="" ></image>
+	<caption>{{item.caption}}</caption>
+	<description>{{item.description}}</description>
+	<category>{{item.category}}</category>
+	<onclick src=""></onclick>
+</slider_item>
